@@ -1,0 +1,156 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Running Ollama with Open WebUI on Google Colab\n",
+    "\n",
+    "This notebook will guide you through setting up Ollama and Open WebUI on Google Colab. Follow these steps in order."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 1. Install Required Dependencies"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "source": [
+    "!apt-get update\n",
+    "!apt-get install -y curl"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 2. Install Ollama"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "source": [
+    "!curl -fsSL https://ollama.com/install.sh | sh"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 3. Start Ollama Server\n",
+    "Run this in the background:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "source": [
+    "!ollama serve > /dev/null 2>&1 &"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 4. Pull a Model (e.g., Llama 2)\n",
+    "You can change the model name to any supported model:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "source": [
+    "!ollama pull llama2"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 5. Install and Run Open WebUI"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "source": [
+    "!docker pull ghcr.io/open-webui/open-webui:main\n",
+    "!docker run -d -p 3000:8080 -v open-webui:/app/backend/data -e OLLAMA_API_BASE_URL=http://localhost:11434/api --name open-webui --restart always ghcr.io/open-webui/open-webui:main"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 6. Set up Port Forwarding with ngrok\n",
+    "Since Colab runs in the cloud, we need to expose the WebUI using ngrok:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "source": [
+    "!pip install pyngrok\n",
+    "from pyngrok import ngrok\n",
+    "\n",
+    "# Start ngrok tunnel\n",
+    "public_url = ngrok.connect(3000)\n",
+    "print(f\"Open WebUI is now available at: {public_url}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Important Notes:\n",
+    "\n",
+    "1. The ngrok URL will change every time you run this notebook\n",
+    "2. Google Colab sessions have time limits and will disconnect after a period of inactivity\n",
+    "3. You'll need to rerun these cells if the Colab runtime disconnects\n",
+    "4. Make sure to use a Colab instance with sufficient RAM for your chosen model\n",
+    "\n",
+    "## Using Open WebUI:\n",
+    "\n",
+    "1. Once everything is set up, click the ngrok URL provided above\n",
+    "2. You can now interact with your Ollama models through the web interface\n",
+    "3. The default credentials for Open WebUI are:\n",
+    "   - Username: admin\n",
+    "   - Password: admin\n",
+    "\n",
+    "Remember to change these credentials after your first login!"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.0"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}
